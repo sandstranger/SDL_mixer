@@ -203,7 +203,7 @@ static Mix_MusicInterface *s_music_interfaces[] =
     &Mix_MusicInterface_NATIVEMIDI,
 #endif
 #ifdef MUSIC_GME
-    &Mix_MusicInterface_GME,
+  //  &Mix_MusicInterface_GME,
 #endif
 };
 

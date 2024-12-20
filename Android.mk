@@ -1,6 +1,10 @@
 # Save the local path
 SDL_MIXER_LOCAL_PATH := $(call my-dir)
 
+#LOCAL_MODULE := SDL2
+#LOCAL_SRC_FILES = $(SDL_MIXER_LOCAL_PATH)/libs/$(TARGET_ARCH_ABI)/libSDL2.so
+#include $(BUILD_PREBUILT)
+
 # Enable this if you want to support loading WAV music
 SUPPORT_WAV ?= true
 
@@ -31,7 +35,7 @@ SUPPORT_WAVPACK ?= true
 WAVPACK_LIBRARY_PATH := external/wavpack
 
 # Enable this if you want to support loading music via libgme
-SUPPORT_GME ?= true
+SUPPORT_GME ?= false
 GME_LIBRARY_PATH := external/libgme
 
 # Enable this if you want to support loading MOD music via XMP-lite
@@ -42,6 +46,7 @@ XMP_LIBRARY_PATH := external/libxmp
 SUPPORT_MID_TIMIDITY ?= false
 TIMIDITY_LIBRARY_PATH := src/codecs/timidity
 
+#include $(SDL_MIXER_LOCAL_PATH)/../../../../../sdl2/Android.mk
 
 # Build the library
 ifeq ($(SUPPORT_FLAC_LIBFLAC),true)
@@ -88,6 +93,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := SDL2_mixer
 
 LOCAL_C_INCLUDES :=                                     \
+	$(LOCAL_PATH)/../../../../../sdl2/include			\
     $(LOCAL_PATH)/include                               \
     $(LOCAL_PATH)/src/                                  \
     $(LOCAL_PATH)/src/codecs                            \
@@ -100,9 +106,13 @@ LOCAL_SRC_FILES :=                                      \
     )
 
 LOCAL_CFLAGS :=
-LOCAL_LDLIBS :=
+ifeq ($(APP_OPTIM),debug)
+	LOCAL_LDLIBS := $(SDL_MIXER_LOCAL_PATH)/../../../../../sdl2/android-project/app/build/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libSDL2.so
+else
+	LOCAL_LDLIBS := $(SDL_MIXER_LOCAL_PATH)/../../../../../sdl2/android-project/app/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libSDL2.so
+endif
 LOCAL_STATIC_LIBRARIES :=
-LOCAL_SHARED_LIBRARIES := SDL2
+#LOCAL_SHARED_LIBRARIES := SDL2
 
 ifeq ($(SUPPORT_WAV),true)
     LOCAL_CFLAGS += -DMUSIC_WAV
@@ -149,6 +159,8 @@ ifeq ($(SUPPORT_GME),true)
     LOCAL_CFLAGS += -DMUSIC_GME
     LOCAL_C_INCLUDES += $(LOCAL_PATH)/$(GME_LIBRARY_PATH)
     LOCAL_STATIC_LIBRARIES += libgme
+else
+    LOCAL_CFLAGS += -DNMUSIC_GME
 endif
 
 ifeq ($(SUPPORT_MOD_XMP),true)
@@ -180,4 +192,3 @@ LOCAL_LDLIBS :=
 LOCAL_EXPORT_LDLIBS :=
 
 include $(BUILD_STATIC_LIBRARY)
-
