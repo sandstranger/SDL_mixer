@@ -1,6 +1,6 @@
 /*
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -326,6 +326,10 @@ static void *WAVPACK_CreateFromFile(const char *file)
     file2 = SDL_stack_alloc(char, len + 2);
     if (!file2) src2 = NULL;
     else {
+        /* this assumes 'file' is a good boy and has 'wv' as an extension.
+         * official wavpack command line tools do the same thing so I'm not
+         * doing anything extra. besides, the wavpack library validates the
+         * correction file, therefore, no harm done.  */
         SDL_memcpy(file2, file, len);
         file2[len] =  'c';
         file2[len + 1] = '\0';

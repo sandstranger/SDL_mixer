@@ -1,6 +1,6 @@
 /*
   PLAYMUS:  A test application for the SDL mixer library.
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef unix
+#if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #endif
 
