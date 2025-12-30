@@ -92,6 +92,8 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := SDL2_mixer
 
+LOCAL_ARM_MODE := arm
+
 LOCAL_C_INCLUDES :=                                     \
 	$(LOCAL_PATH)/../../../../../sdl2/include			\
     $(LOCAL_PATH)/include                               \
@@ -184,6 +186,8 @@ include $(BUILD_SHARED_LIBRARY)
 ###########################
 
 LOCAL_MODULE := SDL2_mixer_static
+
+LOCAL_ARM_MODE := arm
 
 LOCAL_MODULE_FILENAME := libSDL2_mixer
 
