@@ -9,17 +9,17 @@ SDL_MIXER_LOCAL_PATH := $(call my-dir)
 SUPPORT_WAV ?= true
 
 # Enable this if you want to support loading FLAC music via dr_flac
-SUPPORT_FLAC_DRFLAC ?= true
+SUPPORT_FLAC_DRFLAC ?= false
 
 # Enable this if you want to support loading FLAC music with libFLAC
-SUPPORT_FLAC_LIBFLAC ?= false
+SUPPORT_FLAC_LIBFLAC ?= true
 FLAC_LIBRARY_PATH := external/flac
 
 # Enable this if you want to support loading OGG Vorbis music via stb_vorbis
-SUPPORT_OGG_STB ?= true
+SUPPORT_OGG_STB ?= false
 
 # Enable this if you want to support loading OGG Vorbis music via Tremor
-SUPPORT_OGG ?= false
+SUPPORT_OGG ?= true
 OGG_LIBRARY_PATH := external/ogg
 VORBIS_LIBRARY_PATH := external/tremor
 
@@ -39,7 +39,7 @@ SUPPORT_GME ?= true
 GME_LIBRARY_PATH := external/libgme
 
 # Enable this if you want to support loading MOD music via XMP-lite
-SUPPORT_MOD_XMP ?= false
+SUPPORT_MOD_XMP ?= true
 XMP_LIBRARY_PATH := external/libxmp
 
 # Enable this if you want to support TiMidity
