@@ -24,10 +24,10 @@ OGG_LIBRARY_PATH := external/ogg
 VORBIS_LIBRARY_PATH := external/tremor
 
 # Enable this if you want to support loading MP3 music via MINIMP3
-SUPPORT_MP3_MINIMP3 ?= true
+SUPPORT_MP3_MINIMP3 ?= false
 
 # Enable this if you want to support loading MP3 music via MPG123
-SUPPORT_MP3_MPG123 ?= false
+SUPPORT_MP3_MPG123 ?= true
 MPG123_LIBRARY_PATH := external/mpg123
 
 # Enable this if you want to support loading WavPack music via libwavpack
@@ -60,9 +60,9 @@ ifeq ($(SUPPORT_OGG),true)
 endif
 
 # Build the library
-ifeq ($(SUPPORT_MP3_MPG123),true)
-    include $(SDL_MIXER_LOCAL_PATH)/$(MPG123_LIBRARY_PATH)/Android.mk
-endif
+#ifeq ($(SUPPORT_MP3_MPG123),true)
+ #   include $(SDL_MIXER_LOCAL_PATH)/$(MPG123_LIBRARY_PATH)/Android.mk
+#endif
 
 # Build the library
 ifeq ($(SUPPORT_WAVPACK),true)
@@ -146,9 +146,15 @@ endif
 
 # This needs to be a shared library to comply with the LGPL license
 ifeq ($(SUPPORT_MP3_MPG123),true)
-    LOCAL_C_INCLUDES += $(LOCAL_PATH)/$(MPG123_LIBRARY_PATH)/android
+    LOCAL_C_INCLUDES += $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/src/main/jni/MPG123-Android/libmpg123/src/main/jni/mpg123-1.28.2/android
     LOCAL_CFLAGS += -DMUSIC_MP3_MPG123
-    LOCAL_SHARED_LIBRARIES += mpg123
+#    LOCAL_SHARED_LIBRARIES += mpg123
+ifeq ($(APP_OPTIM),debug)
+	LOCAL_LDLIBS := $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/build/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libmpg123.so
+else
+	LOCAL_LDLIBS := $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libmpg123.so
+endif
+
 endif
 
 ifeq ($(SUPPORT_WAVPACK),true)
