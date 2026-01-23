@@ -108,9 +108,9 @@ LOCAL_SRC_FILES :=                                      \
 
 LOCAL_CFLAGS :=
 ifeq ($(APP_OPTIM),debug)
-	LOCAL_LDLIBS := $(SDL_MIXER_LOCAL_PATH)/../../../../../sdl2/android-project/app/build/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libSDL2.so
+	LOCAL_LDLIBS += $(SDL_MIXER_LOCAL_PATH)/../../../../../sdl2/android-project/app/build/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libSDL2.so
 else
-	LOCAL_LDLIBS := $(SDL_MIXER_LOCAL_PATH)/../../../../../sdl2/android-project/app/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libSDL2.so
+	LOCAL_LDLIBS += $(SDL_MIXER_LOCAL_PATH)/../../../../../sdl2/android-project/app/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libSDL2.so
 endif
 LOCAL_STATIC_LIBRARIES :=
 #LOCAL_SHARED_LIBRARIES := SDL2
@@ -147,12 +147,13 @@ endif
 # This needs to be a shared library to comply with the LGPL license
 ifeq ($(SUPPORT_MP3_MPG123),true)
     LOCAL_C_INCLUDES += $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/src/main/jni/MPG123-Android/libmpg123/src/main/jni/mpg123-1.28.2/android
+    LOCAL_C_INCLUDES += $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/src/main/jni/MPG123-Android/libmpg123/src/main/jni/mpg123-1.28.2/src/libmpg123
     LOCAL_CFLAGS += -DMUSIC_MP3_MPG123
 #    LOCAL_SHARED_LIBRARIES += mpg123
 ifeq ($(APP_OPTIM),debug)
-	LOCAL_LDLIBS := $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/build/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libmpg123.so
+	LOCAL_LDLIBS += $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/build/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libmpg123.so
 else
-	LOCAL_LDLIBS := $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libmpg123.so
+	LOCAL_LDLIBS += $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libmpg123.so
 endif
 
 endif
