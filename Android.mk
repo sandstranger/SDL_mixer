@@ -5,17 +5,17 @@ SDL_MIXER_LOCAL_PATH := $(call my-dir)
 SUPPORT_WAV ?= true
 
 # Enable this if you want to support loading FLAC music via dr_flac
-SUPPORT_FLAC_DRFLAC ?= true
+SUPPORT_FLAC_DRFLAC ?= false
 
 # Enable this if you want to support loading FLAC music with libFLAC
-SUPPORT_FLAC_LIBFLAC ?= false
+SUPPORT_FLAC_LIBFLAC ?= true
 FLAC_LIBRARY_PATH := external/flac
 
 # Enable this if you want to support loading OGG Vorbis music via stb_vorbis
-SUPPORT_VORBIS_STB ?= true
+SUPPORT_VORBIS_STB ?= false
 
 # Enable this if you want to support loading OGG Vorbis music via libvorbis
-SUPPORT_VORBIS_LIBVORBIS ?= false
+SUPPORT_VORBIS_LIBVORBIS ?= true
 LIBVORBIS_LIBRARY_PATH := external/vorbis
 
 # Enable this if you want to support loading OGG Vorbis music via Tremor (FOR ARM DEVICES WITHOUT A HARDWARE FLOATING POINT UNIT ONLY!)
@@ -46,7 +46,7 @@ SUPPORT_MID_TIMIDITY ?= false
 TIMIDITY_LIBRARY_PATH := src/timidity
 
 # Enable this if you want to support Opus via libopus
-SUPPORT_OPUS ?= false
+SUPPORT_OPUS ?= true
 OPUS_LIBRARY_PATH := external/opus
 OPUSFILE_LIBRARY_PATH := external/opusfile
 
@@ -59,7 +59,7 @@ ifeq ($(SUPPORT_VORBIS_LIBTREMOR),true)
 endif
 
 # Multiple things need libogg.
-SUPPORT_LIBOGG := false
+SUPPORT_LIBOGG := true
 OGG_LIBRARY_PATH := external/ogg
 ifeq ($(SUPPORT_FLAC_LIBFLAC),true)
     SUPPORT_LIBOGG := true
@@ -126,7 +126,8 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := SDL3_mixer
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include \
+	$(LOCAL_PATH)/../../../../../sdl3/include			\
 
 LOCAL_SRC_FILES :=                                      \
     $(subst $(LOCAL_PATH)/,,                            \
@@ -134,10 +135,15 @@ LOCAL_SRC_FILES :=                                      \
     )
 
 LOCAL_CFLAGS :=
-LOCAL_LDLIBS :=
+ifeq ($(APP_OPTIM),debug)
+	LOCAL_LDLIBS += $(SDL_MIXER_LOCAL_PATH)/../../../../../sdl3/android-project/app/build/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libSDL3.so
+else
+	LOCAL_LDLIBS += $(SDL_MIXER_LOCAL_PATH)/../../../../../sdl3/android-project/app/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libSDL3.so
+endif
+#LOCAL_LDLIBS :=
 LOCAL_LDFLAGS := -Wl,--no-undefined -Wl,--version-script=$(LOCAL_PATH)/src/SDL_mixer.sym
 LOCAL_STATIC_LIBRARIES :=
-LOCAL_SHARED_LIBRARIES := SDL3
+#LOCAL_SHARED_LIBRARIES := SDL3
 
 ifeq ($(SUPPORT_WAV),true)
     LOCAL_CFLAGS += -DDECODER_WAV
