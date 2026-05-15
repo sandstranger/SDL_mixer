@@ -146,8 +146,8 @@ endif
 
 # This needs to be a shared library to comply with the LGPL license
 ifeq ($(SUPPORT_MP3_MPG123),true)
-    LOCAL_C_INCLUDES += $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/src/main/jni/MPG123-Android/libmpg123/src/main/jni/mpg123-1.28.2/android
-    LOCAL_C_INCLUDES += $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/src/main/jni/MPG123-Android/libmpg123/src/main/jni/mpg123-1.28.2/src/libmpg123
+    LOCAL_C_INCLUDES += $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/src/main/jni/MPG123-Android/android
+    LOCAL_C_INCLUDES += $(SDL_MIXER_LOCAL_PATH)/../../../../../mpg123/src/main/jni/MPG123-Android/src/libmpg123
     LOCAL_CFLAGS += -DMUSIC_MP3_MPG123
 #    LOCAL_SHARED_LIBRARIES += mpg123
 ifeq ($(APP_OPTIM),debug)
