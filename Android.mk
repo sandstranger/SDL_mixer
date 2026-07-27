@@ -110,10 +110,8 @@ LOCAL_SRC_FILES :=                                      \
 LOCAL_CFLAGS :=
 ifeq ($(APP_OPTIM),debug)
 	LOCAL_LDLIBS += $(SDL_MIXER_LOCAL_PATH)/../../../../../sdl2-compat/build/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libSDL2.so
-	LOCAL_LDLIBS += $(SDL_MIXER_LOCAL_PATH)/../../../../../SAFFAL/saffal/build/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libsaffal.so
 else
 	LOCAL_LDLIBS += $(SDL_MIXER_LOCAL_PATH)/../../../../../sdl2-compat/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libSDL2.so
-	LOCAL_LDLIBS += $(SDL_MIXER_LOCAL_PATH)/../../../../../SAFFAL/saffal/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/$(TARGET_ARCH_ABI)/libsaffal.so
 endif
 LOCAL_STATIC_LIBRARIES :=
 #LOCAL_SHARED_LIBRARIES := SDL2
