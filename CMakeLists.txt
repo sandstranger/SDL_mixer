@@ -92,7 +92,7 @@ include(GNUInstallDirs)
 include(PkgConfigHelper)
 
 set(PLATFORM_SUPPORTS_SHARED ON)
-if(EMSCRIPTEN OR VITA OR PSP OR PS2 OR N3DS OR RISCOS)
+if(EMSCRIPTEN OR VITA OR PSP OR PS2 OR N3DS OR RISCOS OR DOS)
   set(PLATFORM_SUPPORTS_SHARED OFF)
 endif()
 
@@ -151,7 +151,7 @@ cmake_dependent_option(SDLMIXER_MP3_MPG123_SHARED "Dynamically load mpg123" "${S
 
 option(SDLMIXER_MIDI "Enable MIDI audio" ON)
 
-cmake_dependent_option(SDLMIXER_MIDI_FLUIDSYNTH "Support FluidSynth MIDI output" ON "SDLMIXER_MIDI;NOT SDLMIXER_VENDORED" OFF)
+cmake_dependent_option(SDLMIXER_MIDI_FLUIDSYNTH "Support FluidSynth MIDI output" ON SDLMIXER_MIDI OFF)
 cmake_dependent_option(SDLMIXER_MIDI_FLUIDSYNTH_SHARED "Dynamically load libfluidsynth" "${SDLMIXER_DEPS_SHARED}" SDLMIXER_MIDI_FLUIDSYNTH OFF)
 
 cmake_dependent_option(SDLMIXER_MIDI_TIMIDITY "Support timidity MIDI output" ON SDLMIXER_MIDI OFF)
@@ -691,7 +691,7 @@ if(SDLMIXER_GME)
         endif()
         if(NOT SDLMIXER_GME_SHARED)
             list(APPEND PC_LIBS -l$<TARGET_FILE_BASE_NAME:gme>)
-            list(APPEND INSTALL_EXTRA_CMAKE_MODULES cmake/Findwavpack.cmake)
+            list(APPEND INSTALL_EXTRA_CMAKE_MODULES cmake/Findgme.cmake)
         endif()
     elseif(SDLMIXER_GME_SHARED AND DEFINED SDLMIXER_DYNAMIC_GME AND EXISTS "${SDLMIXER_DYNAMIC_GME}")
         message(STATUS "${PROJECT_NAME}: Using libgme from CMake variable")
@@ -731,6 +731,8 @@ if(SDLMIXER_GME)
     endif()
 endif()
 
+set(tgt_libxmp libxmp::xmp_shared)
+set(tgt_libxmplite libxmp-lite::xmp_lite_shared)
 list(APPEND SDLMIXER_BACKENDS MOD_XMP)
 set(SDLMIXER_MOD_XMP_ENABLED FALSE)
 if(SDLMIXER_MOD_XMP)
@@ -764,8 +766,16 @@ if(SDLMIXER_MOD_XMP)
             find_package(libxmp-lite ${required})
             if(libxmp-lite_FOUND)
                 set(SDLMIXER_MOD_XMP_ENABLED TRUE)
+                set(SDLMIXER_MOD_XMP_LITE_ENABLED TRUE)
                 message(STATUS "Using system libxmp-lite")
-                set(tgt_xmp libxmp-lite::libxmp-lite)
+                if(TARGET libxmp-lite::xmp_lite_shared)
+                  set(tgt_xmp libxmp-lite::xmp_lite_shared)
+                elseif(TARGET libxmp-lite::xmp_lite_static)
+                  set(tgt_xmp libxmp-lite::xmp_lite_static)
+                else()
+                  set(tgt_xmp libxmp-lite::libxmp-lite)
+                endif()
+                set(tgt_libxmplite ${tgt_xmp})
                 set(xmp_name libxmp-lite)
                 if(NOT SDLMIXER_MOD_XMP_SHARED)
                     list(APPEND PC_REQUIRES libxmp-lite)
@@ -789,6 +799,7 @@ if(SDLMIXER_MOD_XMP)
                 else()
                   set(tgt_xmp libxmp::libxmp)
                 endif()
+                set(tgt_libxmp ${tgt_xmp})
                 set(xmp_name libxmp)
                 if(NOT SDLMIXER_MOD_XMP_SHARED)
                     list(APPEND PC_REQUIRES libxmp)
@@ -902,9 +913,31 @@ list(APPEND SDLMIXER_BACKENDS MIDI_FLUIDSYNTH)
 set(SDLMIXER_MIDI_FLUIDSYNTH_ENABLED FALSE)
 if(SDLMIXER_MIDI_FLUIDSYNTH)
     if(SDLMIXER_VENDORED)
-        message(STATUS "Using vendored FluidSynth")
-        message(${fatal_error} "FluidSynth is not vendored.")
-        set(SDLMIXER_MIDI_FLUIDSYNTH_ENABLED FALSE)
+        set(SDLMIXER_MIDI_FLUIDSYNTH_ENABLED TRUE)
+        message(STATUS "Using vendored fluidsynth")
+        sdl_check_project_in_subfolder(external/fluidsynth fluidsynth SDLMIXER_VENDORED)
+        set(disabled_opts enable-alsa  enable-aufile enable-dbus enable-ipv6 enable-jack enable-ladspa
+          enable-libinstpatch enable-libsndfile enable-midishare enable-opensles enable-oboe enable-network
+          enable-oss enable-dsound enable-wasapi enable-waveout enable-winmidi enable-sdl3 enable-pulseaudio
+          enable-pipewire enable-readline enable-threads enable-openmp enable-unicode enable-native enable-signalsmith
+          enable-framework enable-systemd enable-coreaudio enable-coremidi enable-dart enable-kai)
+        foreach(opt ${disabled_opts})
+          set(${opt} FALSE CACHE BOOL "FluidSynth ${opt} option")
+        endforeach()
+        enable_language(CXX)
+        set(osal "cpp11" CACHE STRING "FluidSynth OS Abstraction layer")
+        set(BUILD_SHARED_LIBS "${SDLMIXER_MIDI_FLUIDSYNTH_SHARED}")
+        add_subdirectory(external/fluidsynth external/fluidsynth-build EXCLUDE_FROM_ALL)
+        register_license(fluidsynth external/fluidsynth/LICENSE)
+        if(NOT TARGET FluidSynth::libfluidsynth)
+            add_library(FluidSynth::libfluidsynth ALIAS libfluidsynth)
+        endif()
+        if(SDLMIXER_MIDI_FLUIDSYNTH_SHARED OR NOT SDLMIXER_BUILD_SHARED_LIBS)
+            list(APPEND INSTALL_EXTRA_TARGETS libfluidsynth)
+        endif()
+        if(NOT SDLMIXER_MIDI_FLUIDSYNTH_SHARED)
+            list(APPEND PC_LIBS -l$<TARGET_FILE_BASE_NAME:FluidSynth::libfluidsynth>)
+        endif()
     elseif(SDLMIXER_MIDI_FLUIDSYNTH_SHARED AND DEFINED SDLMIXER_DYNAMIC_MIDI_FLUIDSYNTH AND EXISTS "${SDLMIXER_DYNAMIC_MIDI_FLUIDSYNTH}")
         message(STATUS "${PROJECT_NAME}: Using FluidSynth from CMake variable")
         set(SDLMIXER_MIDI_FLUIDSYNTH_ENABLED TRUE)
@@ -956,6 +989,8 @@ if(SDLMIXER_MIDI_TIMIDITY)
         src/timidity/playmidi.c
         src/timidity/readmidi.c
         src/timidity/resample.c
+        src/timidity/readsbk.c
+        src/timidity/sndfont.c
         src/timidity/tables.c
         src/timidity/timidity.c
     )
@@ -1162,10 +1197,11 @@ if(SDLMIXER_INSTALL)
 
     string(JOIN " " PC_REQUIRES ${PC_REQUIRES})
     string(JOIN " " PC_LIBS ${PC_LIBS})
-    configure_file(cmake/sdl3-mixer.pc.in sdl3-mixer.pc @ONLY)
+    configure_file(cmake/sdl3-mixer.pc.in sdl3-mixer.pc.pre-config @ONLY)
+    file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/sdl3-mixer-$<CONFIG>.pc" INPUT "${CMAKE_CURRENT_BINARY_DIR}/sdl3-mixer.pc.pre-config")
 
     # Always install sdl3-mixer.pc file: libraries might be different between config modes
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sdl3-mixer.pc"
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sdl3-mixer-$<CONFIG>.pc" RENAME "sdl3-mixer.pc"
         DESTINATION "${SDLMIXER_PKGCONFIG_INSTALLDIR}" COMPONENT devel)
 
     install(FILES "LICENSE.txt"
